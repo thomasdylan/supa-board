@@ -1,20 +1,23 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import './App.css';
-import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { createContext } from 'react';
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import MessageBoard from './MessageBoard';
 import AllPosts from './AllPosts';
 import PostView from './PostView';
 import Welcome from './Welcome';
 import NavBar from './NavBar';
+import { SupashipUserInfo, useSession } from './use-session';
 
-const router = createBrowserRouter([
+function App() {
+  return <RouterProvider router={router} />;
+}
+
+export const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
     children: [
       {
-        path: '',
+        path: 'message-board',
         element: <MessageBoard />,
         children: [
           {
@@ -27,25 +30,25 @@ const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: 'welcome',
-        element: <Welcome />,
-      },
     ],
   },
 ]);
 
-function App() {
-  return <RouterProvider router={router} />;
-}
-
-export default App;
+export const UserContext = createContext<SupashipUserInfo>({
+  session: null,
+  profile: null,
+});
 
 function Layout() {
+  const supashipUserInfo = useSession();
   return (
     <>
-      <NavBar />
-      <Outlet />
+      <UserContext.Provider value={supashipUserInfo}>
+        <NavBar />
+        <Outlet />
+      </UserContext.Provider>
     </>
   );
 }
+
+export default App;
